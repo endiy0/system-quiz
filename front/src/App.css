@@ -1,0 +1,26 @@
+.screen-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.screen-page h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 700;
+  text-align: center;
+}
+
+.screen-page--user {
+  color: var(--accent-user);
+}
+
+.screen-page--display {
+  color: var(--accent-display);
+}
+
+.screen-page--admin {
+  color: var(--accent-admin);
+}
