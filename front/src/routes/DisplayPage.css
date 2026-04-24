@@ -4,20 +4,15 @@
   left: 50%;
 }
 .clockbar {
-  display: block;
   width: 300px;
   height: 20px;
-  background-color: white;
+  background: #333;
+  border-radius: 999px;
+  overflow: hidden;
 }
-.progressbar {
-  --animeduration: 0s;
-  animation: progress --animeduration forwards;
-}
-@keyframes progress {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(0 100% 0 0);
-  }
+
+.clockbar-fill {
+  height: 100%;
+  background: white;
+  transition: width 100ms linear;
 }
