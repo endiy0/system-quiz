@@ -100,9 +100,18 @@ io.on("connection", (socket) => {
     }
 
     const { answer, ...problem } = problems[currentProblemIndex];
-    io.to("display").emit("next_quiz", problem);
-    io.to("admin").emit("next_quiz", problem);
-    io.to("user").emit("next_quiz", problem);
+    io.to("display").emit("next_quiz", {
+      problem: problem,
+      duration: QUIZ_DURATION,
+    });
+    io.to("admin").emit("next_quiz", {
+      problem: problem,
+      duration: QUIZ_DURATION,
+    });
+    io.to("user").emit("next_quiz", {
+      problem: problem,
+      duration: QUIZ_DURATION,
+    });
     setTimeout(() => {
       io.to("display").emit("show_answer", answer);
       io.to("admin").emit("show_answer", answer);

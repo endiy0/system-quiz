@@ -1,18 +1,112 @@
-.clock {
+.screen-page {
+  flex-direction: column;
+  justify-content: start;
+  gap: 16px;
+}
+
+.windowtype {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 0;
+  padding: 8px;
+}
+.clockStage {
+  width: 100%;
+  padding: 0 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 0;
+  gap: 8px;
+  p {
+    width: 10%;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+  }
 }
 .clockbar {
-  width: 300px;
+  width: 100%;
   height: 20px;
-  background: #333;
   border-radius: 999px;
   overflow: hidden;
+  background: white;
+  position: relative;
+}
+.clockbar_cover {
+  width: 70%;
+  border-radius: 999px;
+  border: 1.5px white solid;
 }
 
 .clockbar-fill {
   height: 100%;
-  background: white;
   transition: width 100ms linear;
+}
+
+@keyframes timeout {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  74% {
+    background-color: white;
+  }
+  75% {
+    background-color: red;
+  }
+  to {
+    clip-path: inset(0 100% 0 0);
+    background-color: red;
+  }
+}
+@keyframes timeout2 {
+  0%,
+  74% {
+    color: inherit;
+  }
+  75%,
+  100% {
+    color: red;
+  }
+}
+.mainSection {
+  width: 100%;
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 2fr 2fr;
+  gap: 16px;
+}
+
+.glass {
+  color: #fff;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+}
+
+.answerStage {
+  grid-column: 1/3;
+}
+
+.choiseStage {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+.choise {
+  width: 150px;
+  color: #fff;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 30px;
 }
