@@ -16,8 +16,9 @@ function UserPage() {
   const [problems, setProblems] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [nowAnswer, setNowAnswer] = useState<string | null>(null);
-  const [_correctCount, setCorrectCount] = useState<number>(0);
+  const [correctCount, setCorrectCount] = useState<number>(0);
   const [nowCorrect, setNowCorrect] = useState<boolean>(false);
+  const [allProblems, setAllProblems] = useState<number>(0);
 
   const barRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<HTMLParagraphElement | null>(null);
@@ -80,6 +81,7 @@ function UserPage() {
     socket.on("quiz_start", handleQuizStart);
     socket.on("next_quiz", handleQuizStart);
     socket.on("show_answer", handleShowAnswer);
+    socket.on("open_answer", (data: number) => setAllProblems(data));
 
     // 4. クリーンアップ処理（コンポーネントが破棄される時に実行）
     return () => {
@@ -87,6 +89,7 @@ function UserPage() {
       socket.off("quiz_start", handleQuizStart);
       socket.off("next_quiz", handleQuizStart);
       socket.off("show_answer", handleShowAnswer); // ← ここが以前は漏れていたので追加
+      socket.off("open_answer");
     };
   }, []); // 依存配列は空でOK
 
@@ -149,6 +152,21 @@ function UserPage() {
           </div>
         )}
       </main>
+      {allProblems > 0 && (
+        <div className="result_overlay">
+          <div className="result">
+            <h3>結果発表</h3>
+            <div className="result_typo">
+              <div>
+                <h4>／</h4>
+                <h5>{correctCount}</h5>
+                <h6>{allProblems}</h6>
+              </div>
+              <p>問正解！</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

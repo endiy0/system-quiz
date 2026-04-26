@@ -118,6 +118,10 @@ io.on("connection", (socket) => {
       io.to("user").emit("show_answer", answer);
     }, QUIZ_DURATION);
   });
+
+  socket.on("open_answer", () => {
+    io.to("user").emit("open_answer", problems.length);
+  });
 });
 
 server.listen(PORT, () => {

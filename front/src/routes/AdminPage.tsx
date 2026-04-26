@@ -49,6 +49,12 @@ function AdminPage() {
       <button onClick={() => socket.emit("next_quiz")} disabled={!quizStarted}>
         Next Quiz
       </button>
+      <button
+        onClick={() => socket.emit("open_answer")}
+        disabled={!quizStarted}
+      >
+        Open Result
+      </button>
     </main>
   );
 }
