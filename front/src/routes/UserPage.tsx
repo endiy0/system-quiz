@@ -16,7 +16,8 @@ function UserPage() {
   const [problems, setProblems] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [nowAnswer, setNowAnswer] = useState<string | null>(null);
-  const [correctCount, setCorrectCount] = useState<number>(0);
+  const [_correctCount, setCorrectCount] = useState<number>(0);
+  const [nowCorrect, setNowCorrect] = useState<boolean>(false);
 
   const barRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<HTMLParagraphElement | null>(null);
@@ -32,7 +33,7 @@ function UserPage() {
     const intervalId = setInterval(() => {
       setTimer((prev) => {
         // prev（現在の値）を見て判断するため、クロージャ問題が起きない
-        if (prev === null || prev <= 0) return null;
+        if (prev === null || prev < 0) return null;
         return prev - 50;
       });
     }, 50);
@@ -49,13 +50,14 @@ function UserPage() {
       // アニメーションを一度リセットしてから再適用する（連続でアニメーションさせるための必須テクニック）
       if (barRef.current) {
         barRef.current.style.animation = "none";
+        barRef.current.style.inset = "none";
         void barRef.current.offsetWidth; // 強制的に再描画（リフロー）させてアニメーションをリセット
         barRef.current.style.animation = `timeout ${durationSec}s linear forwards`;
       }
       if (timerRef.current) {
         timerRef.current.style.animation = "none";
         void timerRef.current.offsetWidth;
-        timerRef.current.style.animation = `timeout2 ${durationSec}s linear forwards`;
+        timerRef.current.style.animation = `timeout2 ${durationSec}s linear`;
       }
     };
 
@@ -65,6 +67,9 @@ function UserPage() {
 
       if (myAnswer == data) {
         setCorrectCount((value) => value + 1);
+        setNowCorrect(true);
+      } else {
+        setNowCorrect(false);
       }
 
       setTimer(null);
@@ -91,44 +96,60 @@ function UserPage() {
   };
 
   return (
-    <main className="screen-page screen-page--user">
-      <p className="windowtype">User</p>
+    <div className="back">
+      <main className="screen-page screen-page--user">
+        <p className="windowtype">User</p>
 
-      <div className="timer">
-        <p ref={timerRef}>{timer === null ? "-" : Math.ceil(timer / 1000.0)}</p>
-        <div className="clockbar_cover">
-          <div className="clockbar" ref={barRef}></div>
+        <div className="timer">
+          <p ref={timerRef} className="glass2">
+            {timer === null ? "-" : Math.floor(timer / 1000.0)}
+          </p>
+          <div className="glass">
+            <div className="clockbar_cover">
+              <div className="clockbar" ref={barRef}></div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="problem">
-        <p>第{problems ? problems.id : "-"}問：</p>
-        <h3>{problems ? problems.question : ""}</h3>
-      </div>
+        <div className="problem glass">
+          <p>第{problems ? problems.id : "-"}問：</p>
+          <h3>{problems ? problems.question : ""}</h3>
+        </div>
+        <div className="choice glass">
+          {problems &&
+            !nowAnswer &&
+            !answer &&
+            problems.choices.map((value, index) => (
+              <button
+                key={index} // Reactのmap展開では、一意の key を渡すのが必須です
+                className="choicebtn"
+                disabled={nowAnswer !== null}
+                onClick={() => clickHandler(value)}
+              >
+                {value}
+              </button>
+            ))}
+          {problems && (nowAnswer || answer) && (
+            <>
+              <p>あなたの回答：{nowAnswer}</p>
+            </>
+          )}
+        </div>
 
-      <div className="choice">
-        {problems &&
-          problems.choices.map((value) => (
-            <button
-              key={value} // Reactのmap展開では、一意の key を渡すのが必須です
-              className="choiceBtn"
-              disabled={nowAnswer !== null}
-              onClick={() => clickHandler(value)}
-            >
-              {value}
-            </button>
-          ))}
-      </div>
-
-      <div className="answer">
         {answer && (
-          <>
-            <p>答え：</p>
-            <h3>{answer}</h3>
-          </>
+          <div className="answer glass">
+            {answer && (
+              <>
+                <p>答え：</p>
+                <h3>{answer}</h3>
+                {nowCorrect && <h3 className="correct">正解！</h3>}
+                {!nowCorrect && <h3 className="incorrect">残念...</h3>}
+              </>
+            )}
+          </div>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 

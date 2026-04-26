@@ -47,6 +47,7 @@
 @keyframes timeout {
   from {
     clip-path: inset(0 0 0 0);
+    background-color: white;
   }
   74% {
     background-color: white;
