@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import fs from "fs";
+import "dotenv/config";
 
 const problemsjson = JSON.parse(fs.readFileSync("problem.json", "utf-8"));
 
