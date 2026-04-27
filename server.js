@@ -14,7 +14,8 @@ const __distname = path.join(__dirname, "front", "dist");
 
 let problems = problemsjson.problems;
 let currentProblemIndex = 0;
-let quizStatus = "stooped"; // 'stopped', 'running'
+let quizStatus = "stopped"; // 'stopped', 'running'
+let answerTimer = null;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,6 +39,27 @@ app.get("/admin", (req, res) => {
 const server = createServer(app);
 const io = new Server(server);
 
+const clearAnswerTimer = () => {
+  if (answerTimer) {
+    clearTimeout(answerTimer);
+    answerTimer = null;
+  }
+};
+
+const showAnswer = (answer) => {
+  io.to("display").emit("show_answer", answer);
+  io.to("admin").emit("show_answer", answer);
+  io.to("user").emit("show_answer", answer);
+};
+
+const scheduleAnswer = (answer) => {
+  clearAnswerTimer();
+  answerTimer = setTimeout(() => {
+    showAnswer(answer);
+    answerTimer = null;
+  }, QUIZ_DURATION);
+};
+
 io.on("connection", (socket) => {
   if (quizStatus === "running") {
     const { answer, ...problem } = problems[currentProblemIndex];
@@ -58,6 +80,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("quiz_start", () => {
+    clearAnswerTimer();
     currentProblemIndex = 0;
     quizStatus = "running";
     const { answer, ...problem } = problems[currentProblemIndex];
@@ -74,14 +97,11 @@ io.on("connection", (socket) => {
       duration: QUIZ_DURATION,
     });
 
-    setTimeout(() => {
-      io.to("display").emit("show_answer", answer);
-      io.to("admin").emit("show_answer", answer);
-      io.to("user").emit("show_answer", answer);
-    }, QUIZ_DURATION);
+    scheduleAnswer(answer);
   });
 
   socket.on("quiz_stop", () => {
+    clearAnswerTimer();
     io.to("display").emit("quiz_stop");
     io.to("admin").emit("quiz_stop");
     io.to("user").emit("quiz_stop");
@@ -90,6 +110,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("next_quiz", () => {
+    clearAnswerTimer();
     currentProblemIndex++;
     if (currentProblemIndex >= problems.length) {
       currentProblemIndex = 0;
@@ -113,11 +134,7 @@ io.on("connection", (socket) => {
       problem: problem,
       duration: QUIZ_DURATION,
     });
-    setTimeout(() => {
-      io.to("display").emit("show_answer", answer);
-      io.to("admin").emit("show_answer", answer);
-      io.to("user").emit("show_answer", answer);
-    }, QUIZ_DURATION);
+    scheduleAnswer(answer);
   });
 
   socket.on("open_answer", () => {
