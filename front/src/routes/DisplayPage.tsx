@@ -13,30 +13,24 @@ function DisplayPage() {
   useRoleRegistration("display");
   const [problems, setProblems] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
-  const [timer, setTimer] = useState<number | null>(0);
+  const [timer, setTimer] = useState<number | null>(null);
+  const [alltime, setAllTime] = useState<number | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<HTMLParagraphElement | null>(null);
   useEffect(() => {
-    setInterval(() => {
-      if (timer !== null) {
-        setTimer((value) => {
-          if (!value) return value;
-          if (value <= 0) return null;
-          return value - 100;
-        });
-      }
-    }, 100);
+    const intervalId = setInterval(() => {
+      setTimer((prev) => {
+        // prev（現在の値）を見て判断するため、クロージャ問題が起きない
+        if (prev === null || prev < 0) return null;
+        return prev - 50;
+      });
+    }, 50);
 
     socket.on("quiz_start", (data: { problem: Problem; duration: number }) => {
       setProblems(data.problem);
       setAnswer(null);
       setTimer(data.duration);
-      if (barRef !== null) {
-        barRef.current!.style.animation = `timeout ${Math.ceil(data.duration / 1000)}s linear forwards`;
-      }
-      if (timerRef !== null) {
-        timerRef.current!.style.animation = `timeout2 ${Math.ceil(data.duration / 1000)}s linear forwards`;
-      }
+      setAllTime(data.duration);
     });
 
     socket.on("next_quiz", (data: { problem: Problem; duration: number }) => {
@@ -49,6 +43,14 @@ function DisplayPage() {
     socket.on("show_answer", (data: string) => {
       setAnswer(data);
     });
+
+    return () => {
+      clearInterval(intervalId);
+      socket.off("quiz_start");
+      socket.off("next_quiz");
+      socket.off("show_answer"); // ← ここが以前は漏れていたので追加
+      clearInterval(intervalId);
+    };
   }, []);
   return (
     <main className="screen-page screen-page--display">
@@ -58,7 +60,13 @@ function DisplayPage() {
           {timer === null ? "-" : Math.ceil((timer ?? 0) / 1000.0)}
         </p>
         <div className="clockbar_cover">
-          <div className="clockbar" ref={barRef}></div>
+          <div
+            className="clockbar"
+            ref={barRef}
+            style={{
+              clipPath: `inset(0 ${100 - ((timer ?? 0) / (alltime ?? 1)) * 100}% 0 0)`,
+            }}
+          ></div>
         </div>
       </div>
       <section className="mainSection">

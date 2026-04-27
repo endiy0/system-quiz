@@ -13,6 +13,7 @@ function UserPage() {
   useRoleRegistration("user");
 
   const [timer, setTimer] = useState<number | null>(null); // 初期値は0ではなくnullが適切です
+  const [alltime, setAllTime] = useState<number | null>(null); // 初期値は0ではなくnullが適切です
   const [problems, setProblems] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [nowAnswer, setNowAnswer] = useState<string | null>(null);
@@ -43,23 +44,9 @@ function UserPage() {
     const handleQuizStart = (data: { problem: Problem; duration: number }) => {
       setProblems(data.problem);
       setTimer(data.duration);
+      setAllTime(data.duration);
       setAnswer(null);
       setNowAnswer(null);
-
-      const durationSec = Math.ceil(data.duration / 1000);
-
-      // アニメーションを一度リセットしてから再適用する（連続でアニメーションさせるための必須テクニック）
-      if (barRef.current) {
-        barRef.current.style.animation = "none";
-        barRef.current.style.inset = "none";
-        void barRef.current.offsetWidth; // 強制的に再描画（リフロー）させてアニメーションをリセット
-        barRef.current.style.animation = `timeout ${durationSec}s linear forwards`;
-      }
-      if (timerRef.current) {
-        timerRef.current.style.animation = "none";
-        void timerRef.current.offsetWidth;
-        timerRef.current.style.animation = `timeout2 ${durationSec}s linear`;
-      }
     };
 
     // 3. 正解発表時の処理
@@ -109,7 +96,13 @@ function UserPage() {
           </p>
           <div className="glass">
             <div className="clockbar_cover">
-              <div className="clockbar" ref={barRef}></div>
+              <div
+                className="clockbar"
+                ref={barRef}
+                style={{
+                  clipPath: `inset(0 ${100 - ((timer ?? 0) / (alltime ?? 1)) * 100}% 0 0)`,
+                }}
+              ></div>
             </div>
           </div>
         </div>
