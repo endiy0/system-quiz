@@ -35,8 +35,8 @@ function AdminPage() {
   return (
     <main className="screen-page screen-page--admin">
       <h1>Admin</h1>
-      <h2>{problems?.question}</h2>
-      <h2>{problems?.choices.join(", ")}</h2>
+      <h2>{problems ? problems!.question : "-"}</h2>
+      <h2>{problems ? problems!.choices.join(", ") : "-"}</h2>
       <h2>{answer}</h2>
       <button onClick={() => socket.emit("quiz_start")} disabled={quizStarted}>
         Quiz Start
