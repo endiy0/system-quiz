@@ -36,9 +36,8 @@ function DisplayPage() {
     socket.on("next_quiz", (data: { problem: Problem; duration: number }) => {
       setProblems(data.problem);
       setAnswer(null);
-      if (barRef !== null) {
-        barRef.current!.style.animation = `timeout ${Math.ceil(data.duration / 1000)}s ease-out forwards`;
-      }
+      setTimer(data.duration);
+      setAllTime(data.duration);
     });
     socket.on("show_answer", (data: string) => {
       setAnswer(data);
@@ -57,7 +56,7 @@ function DisplayPage() {
       <p className="windowtype">Display</p>
       <div className="glass clockStage">
         <p ref={timerRef}>
-          {timer === null ? "-" : Math.ceil((timer ?? 0) / 1000.0)}
+          {timer === null ? "-" : Math.floor((timer ?? 0) / 1000.0)}
         </p>
         <div className="clockbar_cover">
           <div
