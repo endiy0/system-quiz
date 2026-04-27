@@ -93,6 +93,7 @@ io.on("connection", (socket) => {
     currentProblemIndex++;
     if (currentProblemIndex >= problems.length) {
       currentProblemIndex = 0;
+      io.to("user").emit("open_answer", problems.length);
       io.to("display").emit("quiz_stop");
       io.to("admin").emit("quiz_stop");
       io.to("user").emit("quiz_stop");
